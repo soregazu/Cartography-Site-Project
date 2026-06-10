@@ -1039,7 +1039,7 @@
         const SPOTS = {
             space21: {
                 lat: 37.596205, lng: 127.053782, startName: 'SPACE 21관', endName: 'SPACE 21',
-                icon: 'images/SPACE21 icon.png', logo: 'images/SPACE21 LOGO.png'
+                icon: '../images/SPACE21 icon.png', logo: '../images/SPACE21 LOGO.png'
             },
             maingate: {
                 lat: 37.593820, lng: 127.052642, startName: '정문', endName: '정문',
@@ -1339,7 +1339,8 @@
 
         // 핀 이미지 마커 정의 (상위 폴더 경로 조절)
         function addIconMarker(lat, lng, iconUrl, size = 42) {
-            const cleanUrl = iconUrl.replace('./', '../');
+            // HTML 파일 위치 기준 상대경로를 완전한 절대 URL 주소로 변환하여 엑박 방지
+            const cleanUrl = new URL(iconUrl, window.location.href).href;
             try {
                 const html = `<div style="position:relative; width:${size}px; height:${size}px; display:flex; align-items:center; justify-content:center;">
                     <img src="${cleanUrl}" style="width:100%; height:100%; object-fit:contain; filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.3));" />
