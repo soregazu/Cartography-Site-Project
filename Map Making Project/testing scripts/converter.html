@@ -1,0 +1,225 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>TMAP Address Converter</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body style="background:#111; color:#fff; font-family:sans-serif; padding:20px;">
+    <h1>TMAP Address Converter (Road to Land-Lot)</h1>
+    <div id="status" style="font-size:18px; margin-bottom:20px; color:#ffd043;">Initializing...</div>
+    
+    <h3>Main DB CSV (Converted)</h3>
+    <textarea id="mainResult" style="width:100%; height:250px; background:#222; color:#fff; border:1px solid #444; font-family:monospace;"></textarea>
+    
+    <h3>Cafes DB CSV (Converted)</h3>
+    <textarea id="cafeResult" style="width:100%; height:250px; background:#222; color:#fff; border:1px solid #444; font-family:monospace;"></textarea>
+
+    <script>
+        const TMAP_KEY = 'BDiiaslsLB52AKyxydEkS5b2EfBWm3xy17Tj4iBm';
+
+        const MAIN_CSV = `순번,이름,메뉴,위치,가격대,영업 시간,휴일,식사 길이,브레이크타임,주소
+1,우담,한식,정문 서편,"8,000~10,000","점심, 저녁",X,20분 이상 40분 미만,O,서울 동대문구 경희대로1가길 39
+2,코타,기타,정문 동편,"8,000~10,000","점심, 저녁",X,20분 이상 40분 미만,O,서울 동대문구 회기로21길 7 2층
+3,미스터국밥 경희대 정문점,한식,정문 서편,"5,000~8,000","점심, 저녁, 심야",X,20분 이상 40분 미만,X,서울 동대문구 경희대로 5
+4,회기버거,양식,회기역 앞,"10,000~13,000","점심, 저녁",X,20분 미만,O,서울 동대문구 이문로 46 1층
+5,도읍지,한식,정문 동편,"8,000~10,000","점심, 저녁",일,20분 이상 40분 미만,O,서울 동대문구 회기로21길 38-1
+6,제제집,한식,정문 서편,"10,000~13,000","점심, 저녁",일,20분 이상 40분 미만,X,서울 동대문구 경희대로 19 지하
+7,고기야 미안해,일식,정문 동편,"13,000 초과","저녁, 심야",X,40분 초과,X,서울 동대문구 경희대로4길 20
+8,월미당,동남아,정문 동편,"10,000~13,000","점심, 저녁",X,20분 이상 40분 미만,O,서울 동대문구 경희대로4길 15 1층
+9,어흥식당,양식,정문 서편,"10,000~13,000","점심, 저녁",X,20분 이상 40분 미만,X,서울 동대문구 회기로13길 22 1층
+10,부산밀면냉면,한식,정문 동편,"10,000~13,000","점심, 저녁",월,20분 미만,X,서울 동대문구 경희대로4길 73
+11,카츠이로하,일식,정문 서편,"13,000 초과","점심, 저녁",일,40분 초과,O,서울 동대문구 경희대로3길 17 1층
+12,나폴리식당,한식,후문 앞,"8,000~10,000","점심, 저녁",X,20분 이상 40분 미만,X,서울 동대문구 이문로9길 105
+13,할머니보쌈,한식,정문 동편,"10,000~13,000","점심, 저녁",X,20분 이상 40분 미만,X,서울 동대문구 회기로21길 26
+14,할머니보쌈 분점,한식,후문 앞,"10,000~13,000","점심, 저녁",X,20분 이상 40분 미만,X,서울 동대문구 천장산로7길 30 지층
+15,아빠돈,일식,정문 동편,"10,000~13,000","점심, 저녁",X,20분 이상 40분 미만,O,서울 동대문구 경희대로4길 8 1층
+16,노바 이탈리아노,양식,정문 동편,"13,000 초과","점심, 저녁",X,40분 초과,O,서울 동대문구 회기로21길 44
+17,닭갈비제작소,한식,정문 동편,"13,000 초과","점심, 저녁",X,40분 초과,X,서울 동대문구 경희대로4길 8 2층
+18,준식당,한식,정문 동편,"8,000~10,000","점심, 저녁",토,20분 이상 40분 미만,X,서울 동대문구 경희대로4길 26
+19,카츠로그,일식,정문 동편,"13,000 초과","점심, 저녁",X,20분 이상 40분 미만,X,서울 동대문구 회기로23가길 4
+20,경양카츠,일식,정문 동편,"13,000 초과","점심, 저녁",X,20분 이상 40분 미만,X,서울 동대문구 회기로 146-1 1층
+21,홍익짬뽕,중식,정문 서편,"8,000~10,000","점심, 저녁",X,40분 초과,X,서울 동대문구 회기로13길 18 1층
+22,싸왓디타이,동남아,정문 서편,"13,000 초과","점심, 저녁",X,40분 초과,X,서울 동대문구 경희대로 3 2층
+23,모코모코,일식,정문 동편,"10,000~13,000","점심, 저녁",X,20분 이상 40분 미만,X,서울 동대문구 회기로 147 2층
+24,회기왕갈비탕,한식,회기역 앞,"13,000 초과","점심, 저녁",X,40분 초과,X,서울 동대문구 이문로 54 1층
+25,한솥도시락 외대점,한식,후문 앞,"5,000~8,000","점심, 저녁",X,20분 이상 40분 미만,X,서울 동대문구 이문로 100
+26,부산밀면냉면2,한식,회기역 앞,"8,000~10,000","점심, 저녁",월,20분 이상 40분 미만,X,서울 동대문구 경희대로4길 73
+27,올떡,한식,후문 앞,"8,000~10,000","저녁, 심야",일,40분 초과,X,서울 동대문구 천장산로 31
+28,알촌,한식,후문 앞,"5,000~8,000","점심, 저녁",X,20분 이상 40분 미만,X,서울 동대문구 천장산로7길 10-3 지하 1층
+29,예향칼국수,한식,후문 앞,"5,000~8,000","점심, 저녁",일,20분 이상 40분 미만,X,서울 동대문구 이문로9가길 35
+30,서울치즈피자,양식,외대 앞,"10,000~13,000","점심, 저녁",토,40분 초과,X,서울 동대문구 천장산로7길 26-2
+31,밀플랜비,양식,후문 앞,"10,000~13,000","점심, 저녁",X,20분 이상 40분 미만,X,서울 동대문구 천장산로 36 1층
+32,또정초밥,일식,후문 앞,"13,000 초과","점심, 저녁",X,20분 이상 40분 미만,O,서울 동대문구 천장산로7길 16 2층
+33,Bun99,동남아,후문 앞,"10,000~13,000","점심, 저녁",X,20분 이상 40분 미만,O,서울 동대문구 천장산로4길 36 1층
+34,동경규동,일식,후문 앞,"8,000~10,000","점심, 저녁",X,20분 이상 40분 미만,X,서울 동대문구 이문로35길 21
+35,사나이뚝배기,한식,정문 동편,"5,000~8,000","점심, 저녁",X,40분 초과,X,서울 동대문구 경희대로4길 5 1층
+36,서병장부대찌개,한식,정문 동편,"10,000~13,000","점심, 저녁",금,40분 초과,X,서울 동대문구 회기로21길 34
+37,고깃집 도훈,한식,정문 동편,"10,000~13,000","점심, 저녁",일,40분 초과,X,서울 동대문구 회기로21길 29
+38,불타는닭갈비,한식,정문 동편,"10,000~13,000","점심, 저녁",X,40분 초과,O,서울 동대문구 회기로21길 44
+39,등촌샤브칼국수,한식,정문 동편,"10,000~13,000","점심, 저녁",X,40분 초과,X,서울 동대문구 회기로21길 38-1
+40,경희경양식,양식,정문 서편,"10,000~13,000","점심, 저녁",일,20분 이상 40분 미만,X,서울 동대문구 경희대로1가길 6
+41,1986 시부야버거,양식,정문 서편,"8,000~10,000","점심, 저녁",X,20분 이상 40분 미만,X,서울 동대문구 경희대로1가길 5
+42,솔낭구,한식,정문 동편,"10,000~13,000","점심, 저녁",X,40분 초과,O,서울 동대문구 회기로13길 11
+43,79번지,한식,정문 서편,"5,000~8,000","점심, 저녁",X,20분 이상 40분 미만,O,서울 동대문구 회기로13길 25
+44,스시히노하루,일식,정문 동편,"13,000 초과","점심, 저녁",일,40분 초과,O,서울 동대문구 이문로 45
+45,육회바른연어,일식,정문 서편,"10,000~13,000","점심, 저녁, 심야",X,20분 이상 40분 미만,X,서울 동대문구 경희대로3길 5
+46,육연가,일식,정문 서편,"10,000~13,000","점심, 저녁",X,20분 이상 40분 미만,X,서울 동대문구 경희대로3길 10
+47,삼성루,중식,정문 서편,"8,000~10,000","점심, 저녁",X,20분 이상 40분 미만,X,서울 동대문구 경희대로1가길 27
+48,난바우동,일식,정문 서편,"10,000~13,000","점심, 저녁",X,20분 이상 40분 미만,X,서울 동대문구 경희대로 9
+49,고황뼈다귀해장국,한식,정문 서편,"8,000~10,000","점심, 저녁",X,40분 초과,X,서울 동대문구 경희대로1길 8-30
+50,육쌈냉면,한식,정문 동편,"8,000~10,000","점심, 저녁",X,20분 이상 40분 미만,X,서울 동대문구 경희대로4길 6`;
+
+        const CAFE_CSV = `순번,이름,위치,가격대,영업 시간,휴일,주소
+1,이문동커피집 크럼블로스터,중문 앞,"3,000~5,000","점심, 저녁",x,서울 동대문구 이문로25길 39 1층
+2,백씨네콩다방,정문 동편,"3,000~5,000",점심,"월, 토, 일",서울 동대문구 회기로21길 3 2층
+3,투썸플레이스,정문 서편,"5,000~8,000","점심, 저녁, 심야",,서울 동대문구 경희대로 7-1
+4,리드스트리트커피,정문 동편,"5,000~8,000","점심, 저녁",x,서울 동대문구 회기로 166
+5,스타벅스 경희대점,정문 동편,"5,000~8,000","점심, 저녁",x,서울 동대문구 경희대로 16-1
+6,오트로움,회기역 앞,"5,000~8,000","점심, 저녁",목,서울 동대문구 이문로 45 1층
+7,쿱카페 간호이과대점,교내,"3,000~5,000","점심, 저녁",x,서울 동대문구 경희대로 26
+8,쿱카페 경영대점,교내,"3,000~5,000","점심, 저녁",x,서울 동대문구 경희대로 26 경영대
+9,이디야커피 호텔관광대학점,교내,"5,000~8,000","점심, 저녁",x,서울 동대문구 경희대로 26 호텔관광대
+10,온어스 경희대점,교내,"3,000~5,000","점심, 저녁",x,서울 동대문구 경희대로 26
+11,할리스 커피 청운관점,교내,"5,000~8,000",점심,x,서울 동대문구 경희대로 26 청운관
+12,할리스 커피 푸른솔문화관점,교내,"5,000~8,000","점심, 저녁",x,서울 동대문구 경희대로 26 푸른솔
+13,펠어커피,정문 서편,"3,000~5,000","점심, 저녁",x,서울 동대문구 회기로 136-1
+14,무감커피바,정문 동편,"5,000~8,000","점심, 저녁",x,서울 동대문구 회기로21길 19 지하1층
+15,코너샵카페,후문 앞,"3,000~5,000","점심, 저녁",x,서울 동대문구 이문로9나길 6-13
+16,7카롱,정문 동편,"5,000~8,000","점심, 저녁","토, 일",서울 동대문구 경희대로4길 29 1층
+17,어빌리티커피,후문 앞,"5,000~8,000","점심, 저녁",x,서울 동대문구 이문로9나길 6-14 1층
+18,컴플리트커피,후문 앞,"3,000~5,000","점심, 저녁",x,서울 동대문구 천장산로7길 19
+19,메가커피,정문 동편,"3,000~5,000","점심, 저녁",x,서울 동대문구 경희대로 18
+20,르티안,정문 동편,"5,000~8,000","점심, 저녁",월,서울 동대문구 회기로 148-5 1층`;
+
+        function cleanAddress(address) {
+            if (!address) return '';
+            // Remove floor details, etc.
+            let clean = address.replace(/\s+\d+층$/, '').replace(/\s+지층$/, '')
+                               .replace(/\s+지하$/, '').replace(/\s+지하\s*\d+층$/, '')
+                               .replace(/\s+지하\d+층$/, '')
+                               .replace(/,.*$/, '') // Remove trailing commas
+                               .trim();
+            // Remove description text at the end
+            // "서울 동대문구 이문로 54 1층 회기왕갈비탕" -> "서울 동대문구 이문로 54"
+            clean = clean.replace(/(경희대학교\s+)?경영대(학)?$/, '')
+                         .replace(/(경희대학교\s+)?호텔관광대(학)?$/, '')
+                         .replace(/(경희대학교\s+)?청운관$/, '')
+                         .replace(/(경희대학교\s+)?푸른솔(문화관)?$/, '')
+                         .replace(/회기왕갈비탕$/, '')
+                         .replace(/고깃집도훈$/, '')
+                         .trim();
+            return clean;
+        }
+
+        function convertSingleAddress(addr) {
+            return new Promise(resolve => {
+                const cleaned = cleanAddress(addr);
+                $.ajax({
+                    method: "GET",
+                    headers: { "appKey": TMAP_KEY },
+                    url: "https://apis.openapi.sk.com/tmap/geo/convertAddress?version=1&format=json",
+                    data: {
+                        "searchTypCd": "NtoO",
+                        "reqAdd": cleaned
+                    },
+                    success: function(response) {
+                        try {
+                            const c = response.ConvertAdd;
+                            if (c) {
+                                let res = c.upperDistName + " " + c.middleDistName + " " + c.legalLowerDistName;
+                                if (c.legalDetailName) res += " " + c.legalDetailName;
+                                if (c.primary) {
+                                    res += " " + c.primary;
+                                    if (c.secondary && c.secondary !== "0") {
+                                        res += "-" + c.secondary;
+                                    }
+                                }
+                                resolve(res);
+                            } else {
+                                resolve(addr);
+                            }
+                        } catch(e) {
+                            resolve(addr);
+                        }
+                    },
+                    error: function() {
+                        resolve(addr);
+                    }
+                });
+            });
+        }
+
+        function parseCSVLine(line) {
+            const result = []; let cur = '', inQ = false;
+            for (const ch of line) {
+                if (ch === '"') { inQ = !inQ; }
+                else if (ch === ',' && !inQ) { result.push(cur.trim()); cur = ''; }
+                else { cur += ch; }
+            }
+            result.push(cur.trim());
+            return result;
+        }
+
+        async function startConversion() {
+            // Process Main CSV
+            const mainLines = MAIN_CSV.trim().split('\n');
+            const mainHeader = mainLines[0];
+            const mainConvertedRows = [mainHeader];
+            
+            $("#status").text("Converting Main DB (" + (mainLines.length - 1) + " items)...");
+            for (let i = 1; i < mainLines.length; i++) {
+                const line = mainLines[i];
+                if (!line) continue;
+                const cols = parseCSVLine(line);
+                const originalAddr = cols[cols.length - 1];
+                const convertedAddr = await convertSingleAddress(originalAddr);
+                cols[cols.length - 1] = convertedAddr;
+                
+                // Re-assemble columns with quotes where necessary
+                const reassembled = cols.map(col => {
+                    if (col.includes(',') || col.includes('"')) {
+                        return '"' + col.replace(/"/g, '""') + '"';
+                    }
+                    return col;
+                }).join(',');
+                mainConvertedRows.push(reassembled);
+                $("#status").text("Main DB Progress: " + i + " / " + (mainLines.length - 1));
+                await new Promise(r => setTimeout(r, 100)); // Rate limiting
+            }
+            $("#mainResult").val(mainConvertedRows.join('\n'));
+
+            // Process Cafe CSV
+            const cafeLines = CAFE_CSV.trim().split('\n');
+            const cafeHeader = cafeLines[0];
+            const cafeConvertedRows = [cafeHeader];
+            
+            $("#status").text("Converting Cafe DB (" + (cafeLines.length - 1) + " items)...");
+            for (let i = 1; i < cafeLines.length; i++) {
+                const line = cafeLines[i];
+                if (!line) continue;
+                const cols = parseCSVLine(line);
+                const originalAddr = cols[cols.length - 1];
+                const convertedAddr = await convertSingleAddress(originalAddr);
+                cols[cols.length - 1] = convertedAddr;
+                
+                const reassembled = cols.map(col => {
+                    if (col.includes(',') || col.includes('"')) {
+                        return '"' + col.replace(/"/g, '""') + '"';
+                    }
+                    return col;
+                }).join(',');
+                cafeConvertedRows.push(reassembled);
+                $("#status").text("Cafe DB Progress: " + i + " / " + (cafeLines.length - 1));
+                await new Promise(r => setTimeout(r, 100)); // Rate limiting
+            }
+            $("#cafeResult").val(cafeConvertedRows.join('\n'));
+            $("#status").text("CONVERSION COMPLETE! COPY RESULTS BELOW.");
+        }
+
+        $(document).ready(() => {
+            startConversion();
+        });
+    </script>
+</body>
+</html>
