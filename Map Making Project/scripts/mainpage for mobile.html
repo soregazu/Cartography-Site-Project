@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>오늘! 밥약? 뭐하지!? (Mobile)</title>
     <meta name="description" content="경희대학교 밥약 루트 플래너 - 모바일 버전 맛집 코스 추천">
     <link rel="icon" type="image/png" href="../images/favicon.png">
@@ -51,7 +52,8 @@
             overflow: hidden;
             width: 100vw;
             height: 100vh;
-            position: fixed; /* 모바일 고무줄 스크롤 방지 */
+            position: fixed;
+            /* 모바일 고무줄 스크롤 방지 */
         }
 
         /* ============ 헤더 ============ */
@@ -65,7 +67,8 @@
             z-index: 1000;
             display: flex;
             align-items: center;
-            justify-content: center; /* 모바일은 로고 중앙 정렬이 더 정돈되어 보임 */
+            justify-content: center;
+            /* 모바일은 로고 중앙 정렬이 더 정돈되어 보임 */
             padding: 0 20px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
@@ -89,7 +92,8 @@
             align-items: center;
             justify-content: space-around;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: env(safe-area-inset-bottom); /* iOS 홈 바 영역 대응 */
+            padding-bottom: env(safe-area-inset-bottom);
+            /* iOS 홈 바 영역 대응 */
         }
 
         .nav-item {
@@ -98,7 +102,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 4px;
+            gap: 5px;
             height: 100%;
             background: none;
             border: none;
@@ -113,12 +117,22 @@
         }
 
         .nav-icon {
-            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
             transition: transform 0.2s ease;
         }
 
+        .nav-icon svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
         .nav-item.active .nav-icon {
-            transform: scale(1.1);
+            transform: scale(1.08);
         }
 
         .nav-label {
@@ -300,7 +314,7 @@
         .intro-logo {
             height: 44px;
             object-fit: contain;
-            filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));
+            filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
         }
 
         /* 페이지 2 텍스트 (모바일 최적화 크기) */
@@ -384,7 +398,8 @@
         }
 
         #nav-btn.right {
-            left: calc(50% - 28px); /* 모바일에서는 하단 중앙에 배치하는 것이 조작하기 수월함 */
+            left: calc(50% - 28px);
+            /* 모바일에서는 하단 중앙에 배치하는 것이 조작하기 수월함 */
         }
 
         #nav-btn.left {
@@ -425,38 +440,62 @@
         /* ============ 모바일 바텀시트 (구 #sidebar) ============ */
         #sidebar {
             position: fixed;
-            bottom: -100%; /* 기본 숨김 */
+            bottom: 0;
             left: 0;
             width: 100%;
-            height: 72vh; /* 화면의 72% 정도 차지 */
+            height: 75vh;
+            /* 화면의 75% 정도 차지 */
             background: rgba(247, 250, 252, 0.96);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border-radius: 24px 24px 0 0;
             border-top: 4px solid var(--ba-blue);
             z-index: 1100;
-            padding: 14px 20px 24px 20px;
+            padding: 12px 20px 24px 20px;
             display: flex;
             flex-direction: column;
             gap: 12px;
-            transition: bottom 0.5s cubic-bezier(0.16, 1, 0.3, 1);
             box-shadow: 0 -10px 30px rgba(15, 28, 44, 0.15);
             pointer-events: auto;
             padding-bottom: calc(24px + env(safe-area-inset-bottom));
+
+            /* 드래그 애니메이션 성능 개선을 위해 transform 사용 */
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform;
         }
 
         #sidebar.open {
-            bottom: 0;
+            /* JS에서 translateY 값으로 직접 제어하므로 이 클래스는 fallback 또는 제거 대상 */
+        }
+
+        #sidebar.no-transition {
+            transition: none !important;
         }
 
         /* 바텀시트용 상단 드래그바 장식 */
         .sheet-handle {
-            width: 36px;
+            width: 44px;
             height: 5px;
             background: #cbd5e0;
             border-radius: 3px;
-            margin: 0 auto 6px auto;
+            margin: 0 auto 10px auto;
             cursor: pointer;
+            padding: 4px 0;
+            /* 터치 영역 확장 */
+            background-clip: content-box;
+            touch-action: none;
+            /* 드래그 중 기본 스크롤 등 방지 */
+        }
+
+        /* 드래그 제스처 타겟 영역 */
+        .sheet-drag-area {
+            touch-action: none;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            width: 100%;
+            padding-bottom: 2px;
         }
 
         /* 상단 철제 클립 장식 (바텀시트 크기에 맞춰 정돈) */
@@ -656,7 +695,8 @@
             font-weight: 700;
             outline: none;
             cursor: pointer;
-            height: 38px; /* 모바일 터치 최적화 */
+            height: 38px;
+            /* 모바일 터치 최적화 */
         }
 
         /* 버튼 */
@@ -847,7 +887,8 @@
 
         /* ============ 푸터 (하단바 때문에 간소화) ============ */
         .footer {
-            display: none; /* 모바일 버전에서는 복잡하여 미출력 */
+            display: none;
+            /* 모바일 버전에서는 복잡하여 미출력 */
         }
 
         /* ============ 애니메이션 ============ */
@@ -896,11 +937,23 @@
     <!-- ===== 하단 탭바 네비게이션 ===== -->
     <nav class="bottom-nav">
         <button class="nav-item active" id="navHome" onclick="goPage(1)">
-            <span class="nav-icon">🏠</span>
+            <span class="nav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+            </span>
             <span class="nav-label">HOME</span>
         </button>
         <button class="nav-item" id="navFind" onclick="goPage(2)">
-            <span class="nav-icon">🔍</span>
+            <span class="nav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </span>
             <span class="nav-label">FIND</span>
         </button>
     </nav>
@@ -964,11 +1017,13 @@
 
     <!-- ===== 모바일 바텀시트 (구 #sidebar) ===== -->
     <div id="sidebar">
-        <div class="sheet-handle"></div>
-        <div class="sidebar-clip-deco"></div>
-        <div class="sb-header">
-            <div class="sb-title" id="sb-title">종류별로 찾기</div>
-            <button class="sb-back" onclick="goPage(2)">뒤로</button>
+        <div class="sheet-drag-area">
+            <div class="sheet-handle"></div>
+            <div class="sidebar-clip-deco"></div>
+            <div class="sb-header">
+                <div class="sb-title" id="sb-title">종류별로 찾기</div>
+                <button class="sb-back" onclick="goPage(2)">뒤로</button>
+            </div>
         </div>
         <div class="sb-desc" id="sb-desc">메뉴 종류를 골라 밥약 코스를 추천받으세요.</div>
         <div id="sb-body"></div>
@@ -2056,7 +2111,7 @@
 
             // 페이지 3(지도 찾기)에서 나갈 때 정리
             if (curPage === 3) {
-                sidebar.classList.remove('open');
+                updateSheetPosition(STATE_CLOSED);
                 banner.style.display = 'none';
                 clearAll();
             }
@@ -2084,7 +2139,7 @@
                 p1.className = 'page center active';
                 p2.className = 'page off-right';
                 overlay.classList.remove('hidden');
-                sidebar.classList.remove('open');
+                updateSheetPosition(STATE_CLOSED);
                 banner.style.display = 'none';
                 navBtn.style.display = 'flex';
                 navBtn.className = 'right';
@@ -2098,7 +2153,7 @@
                 p1.className = 'page out-left';
                 p2.className = 'page center active';
                 overlay.classList.remove('hidden');
-                sidebar.classList.remove('open');
+                updateSheetPosition(STATE_CLOSED);
                 banner.style.display = 'none';
                 navBtn.style.display = 'flex';
                 navBtn.className = 'left';
@@ -2121,7 +2176,7 @@
                 initMap();
                 // 바텀시트 & 배너 표시
                 setTimeout(() => {
-                    sidebar.classList.add('open');
+                    updateSheetPosition(STATE_HALF); // 모바일 지도를 탐색하기 편하도록 최초 노출은 Half(중간) 상태로 시작
                     banner.style.display = 'flex';
                     // 출발지 마커 표시 & 초기 바텀시트
                     resetFlow();
@@ -2200,11 +2255,204 @@
             }
         }
 
+        // ─── 바텀시트 상태 및 높이 제어 ───
+        const STATE_EXPANDED = 'expanded';
+        const STATE_HALF = 'half';
+        const STATE_COLLAPSED = 'collapsed';
+        const STATE_CLOSED = 'closed';
+
+        let curSheetState = STATE_CLOSED;
+
+        function getSheetY(state) {
+            const h = window.innerHeight;
+            const sheetHeight = h * 0.75; // 75vh
+            switch (state) {
+                case STATE_EXPANDED:
+                    return 0;
+                case STATE_HALF:
+                    return sheetHeight - h * 0.38; // 화면 하단에서 38vh 노출되도록
+                case STATE_COLLAPSED:
+                    return sheetHeight - 75; // 화면 하단에서 75px 노출 (핸들과 타이틀바 영역)
+                case STATE_CLOSED:
+                default:
+                    return sheetHeight; // 화면 아래로 완전히 숨김
+            }
+        }
+
+        function updateSheetPosition(state, transition = true) {
+            const sidebar = document.getElementById('sidebar');
+            if (!sidebar) return;
+
+            curSheetState = state;
+            const y = getSheetY(state);
+
+            if (transition) {
+                sidebar.classList.remove('no-transition');
+            } else {
+                sidebar.classList.add('no-transition');
+            }
+
+            sidebar.style.transform = `translateY(${y}px)`;
+        }
+
+        // ─── 드래그 제스처 바인딩 ───
+        function initBottomSheetGesture() {
+            const sidebar = document.getElementById('sidebar');
+            const dragArea = document.querySelector('.sheet-drag-area');
+            const handle = document.querySelector('.sheet-handle');
+            if (!sidebar || !dragArea) return;
+
+            let startY = 0;
+            let startTranslateY = 0;
+            let currentTranslateY = 0;
+            let isDragging = false;
+            let startTime = 0;
+
+            // 드래그 시작 함수
+            function onDragStart(y) {
+                isDragging = true;
+                startY = y;
+                startTime = Date.now();
+
+                // 현재 적용되어 있는 transform Y 값 추출
+                const style = window.getComputedStyle(sidebar);
+                const matrix = new WebKitCSSMatrix(style.transform);
+                startTranslateY = matrix.m42; // translateY 위치값
+
+                sidebar.classList.add('no-transition');
+            }
+
+            // 드래그 중 함수
+            function onDragMove(y) {
+                if (!isDragging) return;
+                const deltaY = y - startY;
+                currentTranslateY = startTranslateY + deltaY;
+
+                // 최상단 임계치 (0) 및 최하단 임계치 (시트 총 높이) 설정
+                const h = window.innerHeight;
+                const sheetHeight = h * 0.75;
+                if (currentTranslateY < 0) {
+                    // 고무줄 효과 (위로 당길 때 덜 당겨지도록)
+                    currentTranslateY = currentTranslateY * 0.2;
+                } else if (currentTranslateY > sheetHeight) {
+                    currentTranslateY = sheetHeight;
+                }
+
+                sidebar.style.transform = `translateY(${currentTranslateY}px)`;
+            }
+
+            // 드래그 종료 함수
+            function onDragEnd(y) {
+                if (!isDragging) return;
+                isDragging = false;
+                sidebar.classList.remove('no-transition');
+
+                const deltaY = y - startY;
+                const duration = Date.now() - startTime;
+                const velocity = deltaY / duration; // 드래그 속도 (px/ms)
+
+                let targetState = curSheetState;
+
+                // 속도가 빠르면 플릭(Flick) 제스처로 인정하여 다음 상태로 스냅
+                if (Math.abs(velocity) > 0.3) {
+                    if (velocity < 0) {
+                        // 위로 쓸어 올림
+                        if (curSheetState === STATE_COLLAPSED) targetState = STATE_HALF;
+                        else if (curSheetState === STATE_HALF) targetState = STATE_EXPANDED;
+                        else targetState = STATE_EXPANDED;
+                    } else {
+                        // 아래로 쓸어 내림
+                        if (curSheetState === STATE_EXPANDED) targetState = STATE_HALF;
+                        else if (curSheetState === STATE_HALF) targetState = STATE_COLLAPSED;
+                        else targetState = STATE_COLLAPSED;
+                    }
+                } else {
+                    // 속도가 느리면 가장 가까운 좌표로 스냅
+                    const yExpanded = getSheetY(STATE_EXPANDED);
+                    const yHalf = getSheetY(STATE_HALF);
+                    const yCollapsed = getSheetY(STATE_COLLAPSED);
+
+                    const distExpanded = Math.abs(currentTranslateY - yExpanded);
+                    const distHalf = Math.abs(currentTranslateY - yHalf);
+                    const distCollapsed = Math.abs(currentTranslateY - yCollapsed);
+
+                    const minDist = Math.min(distExpanded, distHalf, distCollapsed);
+                    if (minDist === distExpanded) targetState = STATE_EXPANDED;
+                    else if (minDist === distHalf) targetState = STATE_HALF;
+                    else targetState = STATE_COLLAPSED;
+                }
+
+                updateSheetPosition(targetState, true);
+            }
+
+            // 드래그 핸들 탭 시 상태 순환 전환 (Collapsed -> Half -> Expanded -> Collapsed)
+            let isClickTriggered = false;
+            handle.addEventListener('click', (e) => {
+                e.stopPropagation();
+
+                // 단말기 오동작 방지
+                if (isClickTriggered) return;
+                isClickTriggered = true;
+                setTimeout(() => isClickTriggered = false, 300);
+
+                let nextState = STATE_HALF;
+                if (curSheetState === STATE_COLLAPSED) {
+                    nextState = STATE_HALF;
+                } else if (curSheetState === STATE_HALF) {
+                    nextState = STATE_EXPANDED;
+                } else if (curSheetState === STATE_EXPANDED) {
+                    nextState = STATE_COLLAPSED;
+                }
+                updateSheetPosition(nextState, true);
+            });
+
+            // 터치 이벤트 연결
+            dragArea.addEventListener('touchstart', (e) => {
+                // 클릭/탭 이벤트와 겹치지 않게 타겟 검사
+                if (e.target === handle) return;
+                onDragStart(e.touches[0].clientY);
+            }, { passive: true });
+
+            dragArea.addEventListener('touchmove', (e) => {
+                onDragMove(e.touches[0].clientY);
+            }, { passive: true });
+
+            dragArea.addEventListener('touchend', (e) => {
+                onDragEnd(e.changedTouches[0].clientY);
+            }, { passive: true });
+
+            // 마우스 이벤트 연결 (PC 디버깅용)
+            dragArea.addEventListener('mousedown', (e) => {
+                if (e.target === handle) return;
+                onDragStart(e.clientY);
+
+                const onMouseMove = (moveEvt) => onDragMove(moveEvt.clientY);
+                const onMouseUp = (upEvt) => {
+                    onDragEnd(upEvt.clientY);
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                };
+
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            });
+        }
+
         // ─── 초기화 ───
         document.addEventListener('DOMContentLoaded', () => {
             loadDB();
             startSlideshow();
             runP1Anim();
+
+            // 바텀시트 제스처 초기화
+            initBottomSheetGesture();
+
+            // 윈도우 리사이즈 대응
+            window.addEventListener('resize', () => {
+                if (curSheetState !== STATE_CLOSED) {
+                    updateSheetPosition(curSheetState, false);
+                }
+            });
         });
     </script>
 </body>
