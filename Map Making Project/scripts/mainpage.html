@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 
 <head>
@@ -219,6 +219,7 @@
             height: 100%;
             z-index: 10;
             pointer-events: none;
+            transition: opacity 0.3s ease;
         }
 
         .page {
@@ -232,8 +233,7 @@
             flex-direction: column;
             justify-content: center;
             pointer-events: none;
-            transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1),
-                opacity 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+            transition: opacity 0.5s ease-in-out;
         }
 
         .page.active {
@@ -241,18 +241,19 @@
         }
 
         .page.out-left {
-            transform: translateX(-100vw);
             opacity: 0;
         }
 
         .page.off-right {
-            transform: translateX(100vw);
             opacity: 0;
         }
 
         .page.center {
-            transform: translateX(0);
             opacity: 1;
+        }
+
+        #page2 {
+            padding-left: 180px;
         }
 
         /* 페이지 1 텍스트 */
@@ -2038,18 +2039,12 @@
         function goPage(n) {
             if (n === curPage) return;
 
-            const app = document.getElementById('app-container');
-            const overlay = document.getElementById('map-overlay');
             const sidebar = document.getElementById('sidebar');
             const banner = document.getElementById('banner');
-            const navBtn = document.getElementById('nav-btn');
 
             // 네비 active 상태
             document.getElementById('navHome').classList.toggle('active', n === 1);
             document.getElementById('navFind').classList.toggle('active', n === 2);
-
-            // 페이드 전환
-            app.style.opacity = '0';
 
             // 페이지 3에서 나갈 때 정리
             if (curPage === 3) {
@@ -2058,10 +2053,8 @@
                 clearAll();
             }
 
-            setTimeout(() => {
-                applyPageState(n);
-                app.style.opacity = '1';
-            }, 300);
+            // 대기시간 없이 즉시 상태 클래스를 변경하여 CSS 크로스페이드 유도
+            applyPageState(n);
 
             curPage = n;
         }
